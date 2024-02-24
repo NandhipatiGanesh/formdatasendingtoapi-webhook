@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lead Form</title>
+  </head>
+  <style>
+    form {
+      margin: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+      width: 400px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+      padding: 25px;
+      border-radius: 8px;
+    }
+
+    .submit-button {
+      margin-top: 30px;
+      height: 55px;
+      background: #f2f2f2;
+      border-radius: 11px;
+      border: 0;
+      outline: none;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(180deg, #363636 0%, #1b1b1b 50%, #000000 100%);
+      box-shadow: 0px 0px 0px 0px #ffffff, 0px 0px 0px 0px #000000;
+      transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+      cursor: pointer;
+    }
+
+    .submit-button:hover {
+      box-shadow: 0px 0px 0px 2px #ffffff, 0px 0px 0px 4px #0000003a;
+    }
+
+    .label {
+      top: 5px;
+      left: 5px;
+      font-size: 19px;
+      display: none;
+      background-color: #ffffff;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    input {
+      margin-top: 15px;
+      width: 95%;
+      outline: none;
+      border-radius: 8px;
+      height: 45px;
+      border: 1.5px solid #ecedec;
+      background: transparent;
+      padding-left: 10px;
+    }
+
+    input:focus {
+      border: 1.5px solid #2d79f3;
+    }
+
+    input::placeholder {
+      font-size: 16px;
+      letter-spacing: 0.1px;
+    }
+
+    @media screen and (max-width: 400px) {
+      form {
+        width: 95%;
+        height: auto;
+      }
+
+      .this-body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  </style>
+  <body class="this-body">
+    <form id="leadForm">
+      <label for="Name" class="label" >Name:</label>
+      <input  class="input" placeholder="Name"  type="text" id="Name" name="Name" value="" required />
+      <label for="email" class="label" >Email:</label>
+      <input class="input" placeholder="Email" type="email" id="email" name="email" value="" required />
+      <label for="phoneNumbers" class="label">Mobile: </label>
+      <input  class="input" placeholder="Mobile No." type="tel" id="mobile" name="phoneNumbers" value="" required />
+      <input id="utm_source" type="hidden" name="utm_source" value="">
+      <input id="utm_medium" type="hidden" name="utm_medium" value="">
+      <input id="utm_campaign" type="hidden" name="utm_campaign" value="">
+      <input id="utm_content" type="hidden" name="utm_content" value="">
+      <input id="utm_term" type="hidden" name="utm_term" value="">
+      <div id="mobileError" style="display: none; color: red;">Please enter a valid 10-digit mobile number.</div>
+      <button type="submit" class="submit-button"> Submit</button>
+   </form>
+    <div id="successMessage" style="display: none; color: green;">Successfully submitted!</div>
+
+    <script>
+      document
+        .getElementById("leadForm")
+        .addEventListener("submit", (event) => {
+          const mobileInput = document.getElementById("mobile");
+          const mobileError = document.getElementById("mobileError");
+          const successMessage = document.getElementById("successMessage");
+          const utmCampaign = document.getElementById("utm_campaign");
+          const utmMedium = document.getElementById("utm_medium");
+          const utmTerm = document.getElementById("utm_term");
+          const utmContent = document.getElementById("utm_content");
+
+          //these code for grab the utm parameters 
+          function getUTMParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+          
+            const utmSource = urlParams.get('utm_source');
+            if (utmSource) {
+              document.getElementById('utm_source').value = utmSource;
+            }
+          
+            const utmMedium = urlParams.get('utm_medium');
+            if (utmMedium) {
+              document.getElementById('utm_medium').value = utmMedium;
+            }
+          
+            const utmCampaign = urlParams.get('utm_campaign');
+            if (utmCampaign) {
+              document.getElementById('utm_campaign').value = utmCampaign;
+            }
+          
+            const utmContent = urlParams.get('utm_content');
+            if (utmContent) {
+              document.getElementById('utm_content').value = utmContent;
+            }
+          
+            const utmTerm = urlParams.get('utm_term');
+            if (utmTerm) {
+              document.getElementById('utm_term').value = utmTerm;
+            }
+          }
+          
+          // Call the function when the page loads or when the URL changes
+          window.onload = getUTMParameters;
+          window.onpopstate = getUTMParameters;
+
+          // Grab the UTM parameters
+          getUTMParameters();
+          // Send your payload...
+          if (mobileInput.value.trim() === "" || mobileInput.value.trim().length !== 10 || isNaN(mobileInput.value.trim())) {
+            mobileError.style.display = "block";
+            successMessage.style.display = "none";
+            event.preventDefault();
+          } else {
+            mobileError.style.display = "none";
+            successMessage.style.display = "none";
+            event.preventDefault();
+
+            const apiUrl = "https://api.kylas.io/v1/leads/";
+            const apiKey = "fb62f2f4-1335-4149-8bc5-148c7d6f31a2:11538";
+
+            const leadData = {
+              firstName: document.getElementById("Name").value,
+             utmCampaign: document.getElementById("utm_campaign").value,
+             utmMedium: document.getElementById("utm_medium").value,
+             utmTerm: document.getElementById("utm_term").value,
+             utmContent: document.getElementById("utm_content").value,
+             utmSource: document.getElementById("utm_source").value,
+              emails: [
+                {
+                  type: "OFFICE",
+                  value: document.getElementById("email").value,
+                  primary: true,
+                },
+              ],
+              phoneNumbers: [
+                {
+                  "type": "MOBILE",
+                  "code": "IN",
+                  "value": document.getElementById("mobile").value,
+                  "dialCode": "+91",
+                  "primary": true
+                },
+                {
+                  "type": "MOBILE",
+                  "code": "IN",
+                  "value": "9191919191",
+                  "dialCode": "+91",
+                  "primary": false
+                }
+              ],
+              
+            
+            };
+
+            fetch(apiUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "api-key": apiKey },
+              body: JSON.stringify(leadData),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  successMessage.style.display = "block";
+                  setTimeout(() => {
+                    window.location.href = "https://documenter.getpostman.com/view/3365774/UzBiQ8vJ#909e46b4-9406-4ce4-b288-5b0fc6aa9586"; // Replace "https://example.com" with the URL you want to redirect to
+                  }, 3000); // Redirect after 3 seconds (3000 milliseconds)
+                }
+                return response.json();
+              })
+              .then((data) => console.log(data))
+              .catch((error) => console.error("Error:", error));
+              }
+
+              function sendFormDataToZapier(formData) {
+                const url = 'https://hooks.zapier.com/hooks/catch/13296759/3av2g0s/';
+              
+                const urlSearchParams = new URLSearchParams(formData);
+                const requestBody = urlSearchParams.toString();
+              
+                const request = new XMLHttpRequest();
+                request.open("POST", url, true);
+                request.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+                
+                request.onreadystatechange = function () {
+                  if (request.readyState === XMLHttpRequest.DONE) {
+                    if (request.status === 200) {
+                      console.log("Form data sent to Zapier webhook successfully");
+                    } else {
+                      console.error("Error sending form data to Zapier webhook");
+                    }
+                  }
+                };
+              
+                request.send(requestBody);
+              }
+              
+              const formData = {
+                "name": document.getElementById("Name").value,
+                "email": document.getElementById("email").value,
+                "phoneNumber": document.getElementById("mobile").value,
+              };
+              
+              sendFormDataToZapier(formData);
+              
+
+              }); 
+    </script>
+  </body>
+</html>
