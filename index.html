@@ -158,8 +158,8 @@
             successMessage.style.display = "none";
             event.preventDefault();
 
-            const apiUrl = "https://api.kylas.io/v1/leads/";
-            const apiKey = "fb62f2f4-1335-4149-8bc5-148c7d6f31a2:11538";
+            const apiUrl = "url";
+            const apiKey = "YOUR_API_KEY";
 
             const leadData = {
               firstName: document.getElementById("Name").value,
@@ -204,7 +204,7 @@
                 if (response.ok) {
                   successMessage.style.display = "block";
                   setTimeout(() => {
-                    window.location.href = "https://documenter.getpostman.com/view/3365774/UzBiQ8vJ#909e46b4-9406-4ce4-b288-5b0fc6aa9586"; // Replace "https://example.com" with the URL you want to redirect to
+                    window.location.href = "https://example.com "; // Replace "https://example.com" with the URL you want to redirect to
                   }, 3000); // Redirect after 3 seconds (3000 milliseconds)
                 }
                 return response.json();
@@ -214,7 +214,7 @@
               }
 
               function sendFormDataToZapier(formData) {
-                const url = 'https://hooks.zapier.com/hooks/catch/13296759/3av2g0s/';
+                const url = 'YOUR_WEBHOOK';
               
                 const urlSearchParams = new URLSearchParams(formData);
                 const requestBody = urlSearchParams.toString();
